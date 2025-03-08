@@ -1,25 +1,29 @@
-import { useState } from "react";
-import { OAuthMethod, ParaModal } from "@getpara/react-sdk";
+import { useState, useEffect } from "react";
+import ParasModalCapsule from "./components/ParasModal";
 import Navigation from "./components/Navigation";
-import paras from "./clients/Paras";
-import "@getpara/react-sdk/styles.css";
+import para from "./clients/Para";
+import Hero from "./components/Hero";
+import Safe from "./components/Safe";
 
 function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLogged, setIsLogged] = useState(false);
+
+  useEffect(() => {
+    if (para.getAddress()) {
+        setIsLogged(true);
+    }else {
+      setIsLogged(false);
+    }
+   }, [isLogged]);
 
   return (
-    <div className="w-screen h-screen flex justify-center items-center">
-      <Navigation setIsModalOpen={setIsModalOpen}/>
-      <ParaModal
-        para={paras}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(!isModalOpen)}
-        logo={""}
-        theme={{}}
-        oAuthMethods={["GOOGLE","FARCASTER","TELEGRAM","DISCORD","TWITTER"] as OAuthMethod[]}
-        authLayout={["AUTH:FULL", "EXTERNAL:FULL"]}
-        recoverySecretStepEnabled
-        onRampTestMode={true}
+    <div className="w-screen h-screen flex justify-center items-center space-y-2">
+      <Navigation setIsModalOpen={setIsModalOpen} isLogged={isLogged} />
+      {isLogged ? <Safe /> : <Hero isLogged={isLogged} setIsModalOpen={setIsModalOpen}/>}
+      <ParasModalCapsule
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
       />
       ;
     </div>
