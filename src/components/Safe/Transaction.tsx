@@ -1,9 +1,17 @@
-/* import { protocolKit } from "../../clients/Safe";
+import {useState, useEffect} from 'react'
+//import { sendTransaction } from "../../lib/transaction"
 
-export default function Transaction() {
-  return (
-    <div>
-      <h1>Transaction</h1>
-    </div>
-  );
-} */
+export default function Transactions(){
+  const [first, setfirst] = useState('')
+  useEffect(() => {
+    console.log(first)
+    setfirst('')
+    
+  }, [first])
+  
+ return (
+    <>
+    
+    </>
+  )
+}

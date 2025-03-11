@@ -512,6 +512,28 @@
     node-forge "^1.3.1"
     qs "^6.12.0"
 
+"@getpara/core-sdk@1.5.0":
+  version "1.5.0"
+  resolved "https://registry.npmmirror.com/@getpara/core-sdk/-/core-sdk-1.5.0.tgz#20d3a302ac69541d618b44bdb47d9ef59cea30f1"
+  integrity sha512-yNLohWkNEUloph+XpcMQPRG2Wa9U2D/HS7DM1Toxi6yB8FcGq6v72ZQd1mDA0Vvy2TUmDBvyqOh+Lxd546m8vw==
+  dependencies:
+    "@celo/utils" "^8.0.0"
+    "@cosmjs/encoding" "^0.32.4"
+    "@getpara/user-management-client" "1.5.0"
+    "@noble/hashes" "^1.5.0"
+    base64url "^3.0.1"
+    ethereumjs-util "7.1.5"
+    libphonenumber-js "1.11.2"
+    node-forge "^1.3.1"
+    qs "^6.12.0"
+
+"@getpara/ethers-v6-integration@^1.5.0":
+  version "1.5.0"
+  resolved "https://registry.npmmirror.com/@getpara/ethers-v6-integration/-/ethers-v6-integration-1.5.0.tgz#02ab68f76ff0ca4292677cbfe439d7f20e4635b3"
+  integrity sha512-LUu050vfFXnbsyikB5vTuqn1QLgScsgTKZaa3KFsnd5U7128X2b/99Udd+EQzjqZT9T8k+LeDiGoHDDhqczZdg==
+  dependencies:
+    "@getpara/core-sdk" "1.5.0"
+
 "@getpara/react-common@1.4.4":
   version "1.4.4"
   resolved "https://registry.npmmirror.com/@getpara/react-common/-/react-common-1.4.4.tgz#2391bbdf3adfbf09e2fabe5439285f51befd964c"
@@ -554,6 +576,15 @@
   version "1.4.4"
   resolved "https://registry.npmmirror.com/@getpara/user-management-client/-/user-management-client-1.4.4.tgz#d3d65d882f1785395b5848c25d78ec3de6987e68"
   integrity sha512-VXHLaZFPdt10BeWu6YLr6MFBrd4FdahQOKq6XWV7g+RH8qGUuaxa73jrSncp7P0VoPHxmvPTjchE3P04TLjE2g==
+  dependencies:
+    axios "^1.6.3"
+    libphonenumber-js "1.11.2"
+    qs "^6.12.0"
+
+"@getpara/user-management-client@1.5.0":
+  version "1.5.0"
+  resolved "https://registry.npmmirror.com/@getpara/user-management-client/-/user-management-client-1.5.0.tgz#78fe4340e74967cd825f731d6e1f2e6799fe4297"
+  integrity sha512-7RwtOtVBg31wNH36NvxgCR1tnVlCA5VG7G1pw49iY0G/UcquklhML5RKlD29n3+OCiIFTuwtB/dSF5D/2VMddQ==
   dependencies:
     axios "^1.6.3"
     libphonenumber-js "1.11.2"
@@ -1336,38 +1367,6 @@
   dependencies:
     "@typescript-eslint/types" "8.26.0"
     eslint-visitor-keys "^4.2.0"
-
-"@usecapsule/core-sdk@2.20.1":
-  version "2.20.1"
-  resolved "https://registry.npmmirror.com/@usecapsule/core-sdk/-/core-sdk-2.20.1.tgz#8addb9cc04b7eb4de3667975847166917c442a41"
-  integrity sha512-NitrxnI+f34nTM0a4E5/Oplbzl8Hgy7r0GqaL7Li3SgqCMhTTRFKCf2NKAlS/+jjQYZWVpT6nWGDVhrrOo62hQ==
-  dependencies:
-    "@celo/utils" "^8.0.0"
-    "@cosmjs/encoding" "^0.32.4"
-    "@noble/hashes" "^1.5.0"
-    "@usecapsule/user-management-client" "1.42.1"
-    base64url "^3.0.1"
-    buffer "6.0.3"
-    ethereumjs-util "7.1.5"
-    libphonenumber-js "1.11.2"
-    node-forge "^1.3.1"
-    qs "^6.12.0"
-
-"@usecapsule/ethers-v6-integration@^2.20.1":
-  version "2.20.1"
-  resolved "https://registry.npmmirror.com/@usecapsule/ethers-v6-integration/-/ethers-v6-integration-2.20.1.tgz#77dd60d2d4b13f30459a8688a458dfb08cb1090f"
-  integrity sha512-moRH1c5aGPBXKJrupmprExyq9NAX3GmxP2atLunlv+YI8oWb0ewofV6J6TvGHERcnSA+xQBpnSQOlcH41gMo0Q==
-  dependencies:
-    "@usecapsule/core-sdk" "2.20.1"
-
-"@usecapsule/user-management-client@1.42.1":
-  version "1.42.1"
-  resolved "https://registry.npmmirror.com/@usecapsule/user-management-client/-/user-management-client-1.42.1.tgz#a0e6d1e863e144ba7f0719524dd05ef1a5b11786"
-  integrity sha512-kwz+vbH1YzCbIdml90CLu1YXIwyGUyGUEtgSla/wn0vBkld4ZApopwqvtnOhukMpFIo+uiLlvcFt2xuJaac7lA==
-  dependencies:
-    axios "^1.6.3"
-    libphonenumber-js "1.11.2"
-    qs "^6.12.0"
 
 "@vitejs/plugin-react-swc@^3.8.0":
   version "3.8.0"

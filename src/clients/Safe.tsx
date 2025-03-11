@@ -1,8 +1,6 @@
-import {
-  createParaViemClient,
-  createParaAccount,
-} from "@getpara/viem-v2-integration";
-import { http, parseEther } from "viem";
+import { createParaViemClient, createParaAccount } from "@getpara/viem-v2-integration";
+import { http } from "viem";
+import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 import { baseSepolia } from "viem/chains";
 import Safe, {
   PredictedSafeProps,
@@ -12,16 +10,22 @@ import para from "../clients/Para";
 
 const RPC = import.meta.env.VITE_RPC as string;
 
+if (!para) {
+  throw new Error("Failed to initialize paraViemClient");
+}
+
+let viemParaAccount = createParaAccount(para);
+const pvtKey = generatePrivateKey();
+viemParaAccount = privateKeyToAccount(pvtKey)
+//console.log(viemParaAccount, pvtKey)
+
 export const paraViemClient = createParaViemClient(para, {
-  account: para.getAddress(),
+  account: viemParaAccount,
   chain: baseSepolia,
   transport: http(RPC),
 });
 
-const account = paraViemClient?.account?.publicKey;
-
-const wallet = createParaAccount(para, account);
-console.log(wallet);
+//console.log(await para.ctx.client.getEncryptedWalletPrivateKey()) getEncryptedWalletPrivateKeys(idWallet.userId, 'keccak256')
 
 const safeAccountConfig: SafeAccountConfig = {
   owners: [paraViemClient?.account?.address as string],
@@ -34,59 +38,32 @@ const predictedSafe: PredictedSafeProps = {
 
 export const safeSdk = await Safe.init({
   provider: RPC,
-  signer: account,
+  signer: pvtKey, // Assuming `signature` is the correct property  paraViemClient.account?.address
   predictedSafe,
 });
 
-export const safeAddress = await safeSdk.getAddress();
+export const safeAddress = safeSdk ? await safeSdk.getAddress() : "";
 
 const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction();
 console.log(deploymentTransaction, "DEPLOYMENT");
+
+export const isSafeDeployed = await safeSdk.isSafeDeployed();
+
+//console.log(safeAddress, isSafeDeployed);
+/* 
 const client = await safeSdk.getSafeProvider().getExternalSigner();
-
-console.log(await safeSdk.getSafeProvider().getExternalSigner())
-console.log("Is Safe deployed:", await safeSdk.isSafeDeployed());
-console.log("Safe Address:", await safeSdk.getAddress());
-console.log("Safe Owners:", await safeSdk.getOwners());
-console.log("Safe Threshold:", await safeSdk.getThreshold());
-
-export const sendTransaction = async (
-  safeAddress: string,
-  to: string,
-  value: string
-) => {
-  const transaction = await paraViemClient.sendTransaction({
-    account: safeAddress,
-    to: to,
-    value: parseEther(value),
-    chain: baseSepolia
-  });
-  console.log('Transaction hash:', transaction);
-  return transaction;
-};
-
-/*
 
 const txHash = await client?.sendTransaction({
   to: deploymentTransaction.to,
   value: BigInt(deploymentTransaction.value),
   data: deploymentTransaction.data as `0x${string}`,
-  chain: baseSepolia,
-});
-
-console.log(txHash);
-export const protocolKit = await safeSdk.connect({ safeAddress });
-
-
-export const isSafeDeployed = await protocolKit.isSafeDeployed();
-export const addressSafe = await protocolKit.getAddress();
-
-console.log(isSafeDeployed)
+  chain: baseSepolia
+})
+const txReceipt = client ? await client?.waitForTransactionReceipt({ hash: txHash }) : ''
+console.log(txHash) 
 
 
 
-
-export const safeTxHash = async (safeTrans: SafeTransaction) => {
-  return await protocolKit.getTransactionHash(safeTrans);
-};
+export const safeOwners = await safeSdk.getOwners();
+export const SafeThreshold = await safeSdk.getThreshold();
  */
