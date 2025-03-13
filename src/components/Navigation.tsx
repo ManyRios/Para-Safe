@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { useClient } from "@getpara/react-sdk";
 
 interface NavigationProps {
@@ -10,15 +9,8 @@ export default function Navigation({
   setIsModalOpen,
   isLogged,
 }: NavigationProps) {
-  const [address, setAddress] = useState("");
   const para = useClient();
-  
-  useEffect(() => {
-    if (para) {
-      const result = para.getAddress() as string;
-      setAddress(result);
-    }
-  }, []);
+  const address = para?.getAddress()
 
   return (
     <div>

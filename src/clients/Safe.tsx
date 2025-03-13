@@ -1,6 +1,6 @@
-import { createParaViemClient, createParaAccount } from "@getpara/viem-v2-integration";
+import { createParaAccount, createParaViemClient } from "@getpara/viem-v2-integration";
 import { http } from "viem";
-import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
+import { generatePrivateKey } from 'viem/accounts'
 import { baseSepolia } from "viem/chains";
 import Safe, {
   PredictedSafeProps,
@@ -14,16 +14,17 @@ if (!para) {
   throw new Error("Failed to initialize paraViemClient");
 }
 
-let viemParaAccount = createParaAccount(para);
+const viemParaAccount = createParaAccount(para);
 const pvtKey = generatePrivateKey();
-viemParaAccount = privateKeyToAccount(pvtKey)
-//console.log(viemParaAccount, pvtKey)
+//viemParaAccount = privateKeyToAccount(pvtKey) 
+console.log(viemParaAccount, pvtKey)
 
 export const paraViemClient = createParaViemClient(para, {
   account: viemParaAccount,
   chain: baseSepolia,
   transport: http(RPC),
 });
+
 
 //console.log(await para.ctx.client.getEncryptedWalletPrivateKey()) getEncryptedWalletPrivateKeys(idWallet.userId, 'keccak256')
 
@@ -36,18 +37,21 @@ const predictedSafe: PredictedSafeProps = {
   safeAccountConfig,
 };
 
+console.log(predictedSafe, 'predicted')
+
 export const safeSdk = await Safe.init({
   provider: RPC,
   signer: pvtKey, // Assuming `signature` is the correct property  paraViemClient.account?.address
   predictedSafe,
 });
 
-export const safeAddress = safeSdk ? await safeSdk.getAddress() : "";
+console.log('Is Safe deployed:', await safeSdk.isSafeDeployed())
+console.log('Safe Address:', await safeSdk.getAddress())
+console.log('Safe Owners:', await safeSdk.getOwners())
+//console.log('Safe Threshold:', await safeSdk.getThreshold())
 
 const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction();
 console.log(deploymentTransaction, "DEPLOYMENT");
-
-export const isSafeDeployed = await safeSdk.isSafeDeployed();
 
 //console.log(safeAddress, isSafeDeployed);
 /* 

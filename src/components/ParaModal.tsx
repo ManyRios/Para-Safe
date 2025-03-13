@@ -27,7 +27,6 @@ export default function ParaModalCapsule({
       }
       authLayout={[AuthLayout.AUTH_FULL ,AuthLayout.EXTERNAL_FULL]}
       recoverySecretStepEnabled={true}
-      onRampTestMode={true}
     />
   );
 }

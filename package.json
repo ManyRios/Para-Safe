@@ -10,7 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@getpara/ethers-v6-integration": "^1.5.0",
     "@getpara/react-sdk": "^1.4.4",
     "@getpara/viem-v2-integration": "^1.4.4",
     "@getpara/web-sdk": "^1.4.4",

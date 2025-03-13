@@ -12,21 +12,26 @@ function App() {
   const address = para?.getAddress();
 
   useEffect(() => {
-      if (address != undefined) {
-        console.log('first')
-        setIsLogged(!isLogged);
-      }
-   }, [address]);
+    if (address != undefined) {
+      console.log('first')
+      setIsLogged((prevIsLogged) => !prevIsLogged);
+    }
+ }, [address]); 
+ 
 
   return (
     <div className="w-screen h-screen flex justify-center items-center space-y-2">
-      <Navigation setIsModalOpen={setIsModalOpen} isLogged={isLogged} />
-      {isLogged ? <Safe /> : <Hero isLogged={isLogged} setIsModalOpen={setIsModalOpen}/>}
-      <ParaModalCapsule
-        isModalOpen={isModalOpen}
-        setIsModalOpen={setIsModalOpen}
-      />
-      ;
+        <Navigation setIsModalOpen={setIsModalOpen} isLogged={isLogged} />
+        {isLogged ? (
+          <Safe />
+        ) : (
+          <Hero isLogged={isLogged} setIsModalOpen={setIsModalOpen} />
+        )}
+        <ParaModalCapsule
+          isModalOpen={isModalOpen}
+          setIsModalOpen={setIsModalOpen}
+        />
+        ;
     </div>
   );
 }
