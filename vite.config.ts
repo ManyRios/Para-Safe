@@ -12,7 +12,6 @@ export default defineConfig({
   ],
   server: {
     headers: {
-      // Configura COOP para permitir ventanas emergentes del mismo origen
       'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
       'Cross-Origin-Embedder-Policy': 'require-corp',
     },
