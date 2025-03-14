@@ -3,7 +3,7 @@ import {
   createParaViemClient,
 } from "@getpara/viem-v2-integration";
 import { http } from "viem";
-import { generatePrivateKey } from "viem/accounts";
+import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { baseSepolia } from "viem/chains";
 import Safe, {
   PredictedSafeProps,
@@ -17,10 +17,9 @@ if (!para) {
   throw new Error("Failed to initialize paraViemClient");
 }
 
-try {
-  const viemParaAccount = createParaAccount(para);
+  let viemParaAccount = createParaAccount(para);
   const pvtKey = generatePrivateKey();
-  //viemParaAccount = privateKeyToAccount(pvtKey)
+  viemParaAccount = privateKeyToAccount(pvtKey)
   console.log(viemParaAccount, pvtKey);
   
   const paraViemClient = createParaViemClient(para, {
@@ -44,11 +43,13 @@ try {
 
    const safeSdk = await Safe.init({
     provider: RPC,
-    signer: pvtKey, // Assuming `signature` is the correct property  paraViemClient.account?.address
+    signer: paraViemClient.account?.address, 
     predictedSafe,
   });
 
+  console.log('before')
   if (!await safeSdk.isSafeDeployed()) {
+    console.log('after')
     const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction();
     
     const txHash = await paraViemClient.sendTransaction({
@@ -68,10 +69,8 @@ try {
   console.log("Safe Owners:", await safeSdk.getOwners());
   //console.log('Safe Threshold:', await safeSdk.getThreshold())
 
+  console.log();
 
-} catch (error) {
-  console.log(error);
-}
 
 //console.log(safeAddress, isSafeDeployed);
 /* 
