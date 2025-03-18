@@ -17,6 +17,7 @@
     "@safe-global/protocol-kit": "^5.2.4",
     "@safe-global/safe-core-sdk-types": "^2.3.0",
     "@tailwindcss/vite": "^4.0.9",
+    "@tanstack/react-query": "^5.68.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwindcss": "^4.0.9",

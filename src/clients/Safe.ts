@@ -1,14 +1,7 @@
-import {
-  createParaAccount,
-  createParaViemClient,
-} from "@getpara/viem-v2-integration";
-import { http } from "viem";
-import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
+import { createParaViemClient } from "@getpara/viem-v2-integration";
+import { http  } from "viem";
 import { baseSepolia } from "viem/chains";
-import Safe, {
-  PredictedSafeProps,
-  SafeAccountConfig,
-} from "@safe-global/protocol-kit";
+import Safe, { PredictedSafeProps, SafeAccountConfig } from "@safe-global/protocol-kit";
 import para from "./Para";
 
 const RPC = import.meta.env.VITE_RPC as string;
@@ -17,76 +10,67 @@ if (!para) {
   throw new Error("Failed to initialize paraViemClient");
 }
 
-  let viemParaAccount = createParaAccount(para);
-  const pvtKey = generatePrivateKey();
-  viemParaAccount = privateKeyToAccount(pvtKey)
-  console.log(viemParaAccount, pvtKey);
-  
-  const paraViemClient = createParaViemClient(para, {
-    account: viemParaAccount,
-    chain: baseSepolia,
-    transport: http(RPC),
-  });
+export async function initializeSafe() {
+  try {
 
-  //console.log(await para.ctx.client.getEncryptedWalletPrivateKey()) getEncryptedWalletPrivateKeys(idWallet.userId, 'keccak256')
-
-  const safeAccountConfig: SafeAccountConfig = {
-    owners: [paraViemClient?.account?.address as string],
-    threshold: 1,
-  };
-
-  const predictedSafe: PredictedSafeProps = {
-    safeAccountConfig,
-  };
-
-  console.log(predictedSafe, "predicted");
-
-   const safeSdk = await Safe.init({
-    provider: RPC,
-    signer: paraViemClient.account?.address, 
-    predictedSafe,
-  });
-
-  console.log('before')
-  if (!await safeSdk.isSafeDeployed()) {
-    console.log('after')
-    const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction();
-    
-    const txHash = await paraViemClient.sendTransaction({
-      to: deploymentTransaction.to as `0x${string}`,
-      value: BigInt(deploymentTransaction.value),
-      data: deploymentTransaction.data as `0x${string}`,
+    const paraViemClient = createParaViemClient(para, {
       chain: baseSepolia,
-      account: viemParaAccount,
+      transport: http(RPC),
     });
-    console.log(txHash)
-    //await paraViemClient.waitForTransactionReceipt({ hash: txHash });
+
+    if (!paraViemClient?.account?.address) {
+      throw new Error("No account found in paraViemClient");
+    }
+
+    const safeAccountConfig: SafeAccountConfig = {
+      owners: [paraViemClient.account.address],
+      threshold: 1,
+    };
+
+    
+    const sign = paraViemClient.account.address
+
+    const predictedSafe: PredictedSafeProps = {
+      safeAccountConfig,
+    };
+
+    const safeSdk = await Safe.init({
+      provider: RPC,
+      signer: sign, //paraViemClient.account.address,
+      predictedSafe,
+    });
+
+    if (!safeSdk) {
+      throw new Error("Failed to initialize Safe SDK");
+    }
+    
+    console.log(await safeSdk.isSafeDeployed())
+
+    if ((await safeSdk.isSafeDeployed())) { //(!await safeSdk.isSafeDeployed())
+      console.log("Safe not deployed. Deploying...");
+
+      // Crear la transacción de despliegue
+      const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction();
+      console.log("Deployment Transaction:", deploymentTransaction);
+
+      const client = await safeSdk.getSafeProvider().getExternalSigner();
+      if (!client) {
+        throw new Error("Failed to get external signer");
+      }
+
+      const txHash = await client.sendTransaction({
+        to: deploymentTransaction.to as `0x${string}`,
+        value: BigInt(deploymentTransaction.value),
+        data: deploymentTransaction.data as `0x${string}`,
+        chain: baseSepolia,
+      });
+
+      console.log("Transaction Hash:", txHash);
+    } else {
+      console.log("Safe is already deployed");
+    }
+    return {safeSdk, paraViemClient}
+  } catch (error) {
+    console.error("Error initializing Safe:", error);
   }
-
-
-  console.log("Is Safe deployed:", await safeSdk.isSafeDeployed());
-  console.log("Safe Address:", await safeSdk.getAddress());
-  console.log("Safe Owners:", await safeSdk.getOwners());
-  //console.log('Safe Threshold:', await safeSdk.getThreshold())
-
-  console.log();
-
-
-//console.log(safeAddress, isSafeDeployed);
-/* 
-const client = await safeSdk.getSafeProvider().getExternalSigner();
-
-const txHash = await client?.sendTransaction({
-  to: deploymentTransaction.to,
-  value: BigInt(deploymentTransaction.value),
-  data: deploymentTransaction.data as `0x${string}`,
-  chain: baseSepolia
-})
-const txReceipt = client ? await client?.waitForTransactionReceipt({ hash: txHash }) : ''
-console.log(txHash) 
-
-
-
-export const safeOwners = await safeSdk.getOwners();
-export const SafeThreshold = await safeSdk.getThreshold();
- */
+}

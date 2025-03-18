@@ -1,16 +1,20 @@
-import { useClient } from "@getpara/react-sdk";
+import { useAccount, useClient, useWallet } from "@getpara/react-sdk";
 
 interface NavigationProps {
-  isLogged: boolean;
+  isLogged?: boolean;
   setIsModalOpen: (value: boolean) => void;
 }
 
 export default function Navigation({
   setIsModalOpen,
-  isLogged,
 }: NavigationProps) {
-  const para = useClient();
-  const address = para?.getAddress()
+  //const [paraAddress, setParaAddress] = useState('')
+  const { data: wallet } = useWallet();
+  const { data: account } = useAccount();
+  const para = useClient(); 
+  
+ 
+  
 
   return (
     <div>
@@ -26,12 +30,16 @@ export default function Navigation({
             </span>
           </a>
           <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-            {isLogged && (
+            {account?.isConnected && (
               <label
                 htmlFor=""
                 className=" text-center invisible flex md:visible text-white mr-2 justify-center p-auto items-center"
               >
-                {address}
+                {
+                  para
+                  ? wallet
+                    ? para.getDisplayAddress(wallet.id, { truncate: true, addressType: wallet.type })
+                    : '' : ''} 
               </label>
             )}
             <button
@@ -39,7 +47,7 @@ export default function Navigation({
               className="text-white bg-green-600 hover:bg-transparent hover:cursor-pointer focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center  dark:focus:ring-blue-800"
               onClick={() => setIsModalOpen(true)}
             >
-              {isLogged ? "Connected" : "Sign in"}
+              {account?.isConnected ? "Connected" : "Sign in"}
             </button>
             <button
               data-collapse-toggle="navbar-sticky"
