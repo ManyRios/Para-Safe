@@ -1,4 +1,5 @@
-import { useState, createContext, useContext, ReactNode } from "react";
+import { useState, createContext, useContext, ReactNode, useEffect } from "react";
+import { useAccount, useSignMessage } from "@getpara/react-sdk";
 import { initializeSafe } from "../clients/Safe";
 
 interface IStateContext {
@@ -9,13 +10,41 @@ const Context = createContext<IStateContext | null>(null);
 
 export const StateContext  = ({ children }: { children: ReactNode }) => {
   const [safeAcc, setSafeAcc] = useState<string>("");
+  const { data: account } = useAccount();
+  const { signMessageAsync } = useSignMessage();
+  /* const { data: wallet } = useWallet(); */
+
+
+  const message = "Trying this message"
+
+  const [messageSignature, setMessageSignature] = useState<string | undefined>(undefined);
+
+  const handleSign = async () => {
+
+    const signatureRes = await signMessageAsync({
+      messageBase64: Buffer.from(message).toString("base64"),
+    });
+    if (!("pendingTransactionId" in signatureRes) && signatureRes.signature) {
+      setMessageSignature(signatureRes.signature);
+      console.log(signatureRes.signature)
+    }
+  };
 
   const init = async () => {
-      const res = await initializeSafe()
-      const sfeAdd =  await res?.safeSdk.getAddress()
-      if(sfeAdd) setSafeAcc(sfeAdd)
+    console.log('first')
+        console.log('MESSAGE SIGNATURE', messageSignature)
+        const res = await initializeSafe();
+        const sfeAdd = await res?.safeSdk.getAddress();
+        if (sfeAdd) setSafeAcc(sfeAdd);
+  
   }
-  init()
+
+  useEffect(() => {
+    handleSign()
+      init()
+  }, [account])
+  
+ 
 
   return (
     <Context.Provider

@@ -1,18 +1,21 @@
 import { createParaViemClient } from "@getpara/viem-v2-integration";
-import { http  } from "viem";
+import { http } from "viem";
 import { baseSepolia } from "viem/chains";
-import Safe, { PredictedSafeProps, SafeAccountConfig } from "@safe-global/protocol-kit";
+import Safe, {
+  PredictedSafeProps,
+  SafeAccountConfig,
+} from "@safe-global/protocol-kit";
 import para from "./Para";
 
-const RPC = import.meta.env.VITE_RPC as string;
+const RPC = import.meta.env.VITE_RPC as string; //'https://sepolia.infura.io/v3/d32b3bab0bb84330839e92457ea50426'
 
 if (!para) {
   throw new Error("Failed to initialize paraViemClient");
 }
 
 export async function initializeSafe() {
+ 
   try {
-
     const paraViemClient = createParaViemClient(para, {
       chain: baseSepolia,
       transport: http(RPC),
@@ -27,30 +30,30 @@ export async function initializeSafe() {
       threshold: 1,
     };
 
-    
-    const sign = paraViemClient.account.address
-
     const predictedSafe: PredictedSafeProps = {
       safeAccountConfig,
     };
 
+
     const safeSdk = await Safe.init({
       provider: RPC,
-      signer: sign, //paraViemClient.account.address,
+      signer: paraViemClient.account.address, //paraViemClient.account.address,
       predictedSafe,
     });
 
     if (!safeSdk) {
       throw new Error("Failed to initialize Safe SDK");
     }
-    
-    console.log(await safeSdk.isSafeDeployed())
 
-    if ((await safeSdk.isSafeDeployed())) { //(!await safeSdk.isSafeDeployed())
+    console.log(await safeSdk.isSafeDeployed());
+
+    if (await safeSdk.isSafeDeployed()) {
+      //(!await safeSdk.isSafeDeployed())
       console.log("Safe not deployed. Deploying...");
 
       // Crear la transacción de despliegue
-      const deploymentTransaction = await safeSdk.createSafeDeploymentTransaction();
+      const deploymentTransaction =
+        await safeSdk.createSafeDeploymentTransaction();
       console.log("Deployment Transaction:", deploymentTransaction);
 
       const client = await safeSdk.getSafeProvider().getExternalSigner();
@@ -69,7 +72,7 @@ export async function initializeSafe() {
     } else {
       console.log("Safe is already deployed");
     }
-    return {safeSdk, paraViemClient}
+    return { safeSdk, paraViemClient };
   } catch (error) {
     console.error("Error initializing Safe:", error);
   }
