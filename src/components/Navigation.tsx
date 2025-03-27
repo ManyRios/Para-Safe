@@ -12,7 +12,7 @@ export default function Navigation({
   const { data: wallet } = useWallet();
   const { data: account } = useAccount();
   const para = useClient(); 
-  
+
   return (
     <div>
       <nav className="bg-white dark:bg-orange-600 fixed w-full z-20 top-0 start-0 border-b border-gray-200 border-2 dark:border-gray-600">
@@ -35,7 +35,7 @@ export default function Navigation({
                 {
                   para
                   ? wallet
-                    ? para.getDisplayAddress(wallet.id, { truncate: true, addressType: wallet.type })
+                    ? para.getDisplayAddress(wallet.id, { truncate: false, addressType: wallet.type })
                     : '' : ''} 
               </label>
             )}
@@ -46,6 +46,7 @@ export default function Navigation({
             >
               {account?.isConnected ? "Connected" : "Sign in"}
             </button>
+            {account?.isConnected ? <span>{}</span> : ''}
           </div>
         </div>
       </nav>

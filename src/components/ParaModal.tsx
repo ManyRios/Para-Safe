@@ -19,14 +19,13 @@ export default function ParaModalCapsule({
       oAuthMethods={
         [
           OAuthMethod.GOOGLE,
-          OAuthMethod.FARCASTER,
-          OAuthMethod.TELEGRAM,
           OAuthMethod.DISCORD,
           OAuthMethod.TWITTER,
         ]
       }
       authLayout={[AuthLayout.AUTH_FULL ,AuthLayout.EXTERNAL_FULL]}
       recoverySecretStepEnabled={true}
+      onRampTestMode={false}
     />
   );
 }

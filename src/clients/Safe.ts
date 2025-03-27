@@ -1,53 +1,53 @@
-import { createParaViemClient } from "@getpara/viem-v2-integration";
-import { http } from "viem";
-import { baseSepolia } from "viem/chains";
-import Safe, {
-  PredictedSafeProps,
-  SafeAccountConfig,
-} from "@safe-global/protocol-kit";
-import para from "./Para";
+import Safe, { SafeAccountConfig, PredictedSafeProps  } from "@safe-global/protocol-kit";
+import { createPublicClient, http} from 'viem'
+import {  baseSepolia } from "viem/chains";
+import para, { paraViemClient, paraAccount } from "./Para"
 
-const RPC = import.meta.env.VITE_RPC as string; //'https://sepolia.infura.io/v3/d32b3bab0bb84330839e92457ea50426'
+const RPC_BASESEPOLIA = import.meta.env.VITE_RPC_BASESEPOLIA as string;
+//const RPC_ETHSEPOLIA = import.meta.env.VITE_RPC_ETHSEPOLIA as string;
 
 if (!para) {
   throw new Error("Failed to initialize paraViemClient");
 }
 
 export async function initializeSafe() {
- 
+  
   try {
-    const paraViemClient = createParaViemClient(para, {
-      chain: baseSepolia,
-      transport: http(RPC),
-    });
-
+   
     if (!paraViemClient?.account?.address) {
       throw new Error("No account found in paraViemClient");
     }
 
-    const safeAccountConfig: SafeAccountConfig = {
-      owners: [paraViemClient.account.address],
+    const publicClient = createPublicClient({
+      chain: baseSepolia,
+      transport: http(RPC_BASESEPOLIA),
+    });
+
+    const signerAddress = paraAccount.address;
+
+    const safeAccountConfiguration: SafeAccountConfig = {
+      owners: [signerAddress],
       threshold: 1,
     };
 
     const predictedSafe: PredictedSafeProps = {
-      safeAccountConfig,
-    };
-
+      safeAccountConfig: safeAccountConfiguration
+    }
 
     const safeSdk = await Safe.init({
-      provider: RPC,
-      signer: paraViemClient.account.address, //paraViemClient.account.address,
-      predictedSafe,
+      provider: paraViemClient.transport,
+      signer: signerAddress,
+      predictedSafe
     });
 
     if (!safeSdk) {
       throw new Error("Failed to initialize Safe SDK");
     }
 
-    console.log(await safeSdk.isSafeDeployed());
+    const safeAddress = await safeSdk.getAddress()
+    console.log(await safeSdk.isSafeDeployed(), 'OWNERS', paraViemClient.account.address);
 
-    if (await safeSdk.isSafeDeployed()) {
+    if ((!await safeSdk.isSafeDeployed())) {
       //(!await safeSdk.isSafeDeployed())
       console.log("Safe not deployed. Deploying...");
 
@@ -56,23 +56,32 @@ export async function initializeSafe() {
         await safeSdk.createSafeDeploymentTransaction();
       console.log("Deployment Transaction:", deploymentTransaction);
 
-      const client = await safeSdk.getSafeProvider().getExternalSigner();
-      if (!client) {
-        throw new Error("Failed to get external signer");
-      }
-
-      const txHash = await client.sendTransaction({
+      const txHash = await paraViemClient.sendTransaction({
         to: deploymentTransaction.to as `0x${string}`,
-        value: BigInt(deploymentTransaction.value),
+        value: BigInt(deploymentTransaction.value || 0),
         data: deploymentTransaction.data as `0x${string}`,
+        account: paraAccount,
         chain: baseSepolia,
       });
 
-      console.log("Transaction Hash:", txHash);
+      console.log('waiting for txHash')
+
+      const receipt = await publicClient.waitForTransactionReceipt({
+        hash: txHash,
+      });
+
+      const connectedProtocolKit = await safeSdk.connect({
+        safeAddress,
+        signer: signerAddress,
+        provider: publicClient.transport,
+      });
+
+      console.log("Transaction Hash:", receipt);
+      return {protocolKit: connectedProtocolKit, safeAddress}
     } else {
       console.log("Safe is already deployed");
     }
-    return { safeSdk, paraViemClient };
+    return { safeSdk, safeAddress };
   } catch (error) {
     console.error("Error initializing Safe:", error);
   }

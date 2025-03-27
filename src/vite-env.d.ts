@@ -5,7 +5,8 @@ import { Environment } from "@getpara/web-sdk";
 interface ParasEnv {
   readonly VITE_CAPSULE_ENV: Environment.BETA;
   readonly VITE_PARA_API_KEY: string;
-  readonly VITE_RPC: string;
+  readonly VITE_RPC_BASESEPOLIA: string;
+  readonly VITE_RPC_ETHSEPOLIA: string;
 }
 
 interface ImportMeta {
