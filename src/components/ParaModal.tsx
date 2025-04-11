@@ -1,5 +1,4 @@
 import { OAuthMethod, ParaModal, AuthLayout } from "@getpara/react-sdk";
-import para from "../clients/Para";
 
 interface IParaModal {
   isModalOpen: boolean;
@@ -11,7 +10,6 @@ export default function ParaModalCapsule({
 }: IParaModal) {
   return (
     <ParaModal
-      para={para}
       isOpen={isModalOpen}
       onClose={() => setIsModalOpen(!isModalOpen)}
       logo={""}

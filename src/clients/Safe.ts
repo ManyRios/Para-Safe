@@ -20,7 +20,7 @@ import {
 } from "@getpara/viem-v2-integration";
 import { MetaTransactionData, OperationType } from "@safe-global/types-kit";
 
-const RPC_ETHSEPOLIA = import.meta.env.VITE_RPC_ETHSEPOLIA as string;
+const infura = http();
 
 export async function initializeSafe(para: ParaWeb) {
   try {
@@ -29,10 +29,7 @@ export async function initializeSafe(para: ParaWeb) {
     const paraViemClient = createParaViemClient(para, {
       account: paraAccount,
       chain: sepolia,
-      transport: http(RPC_ETHSEPOLIA, {
-        timeout: 10000,
-        retryDelay: 1000,
-      }),
+      transport: infura,
     });
 
     if (!paraViemClient) {
@@ -62,12 +59,6 @@ export async function initializeSafe(para: ParaWeb) {
 
     const safeAddress = await safeSdk.getAddress();
 
-    const client = await safeSdk.getSafeProvider().getExternalSigner();
-
-    if (!client) {
-      throw new Error("Failed to get Client");
-    }
-
     const isDeployed = await safeSdk.isSafeDeployed();
 
     return { safeSdk, safeAddress, isDeployed };
@@ -86,10 +77,7 @@ export const deploySafe = async (para: ParaWeb) => {
     const paraViemClient = createParaViemClient(para, {
       account: paraAccount,
       chain: sepolia,
-      transport: http(RPC_ETHSEPOLIA, {
-        timeout: 10000,
-        retryDelay: 1000,
-      }),
+      transport: infura,
     });
 
     if (!paraViemClient) {
@@ -98,10 +86,7 @@ export const deploySafe = async (para: ParaWeb) => {
 
     const walletClient = createPublicClient({
       chain: sepolia,
-      transport: http(RPC_ETHSEPOLIA, {
-        timeout: 10000,
-        retryDelay: 1000,
-      }),
+      transport: infura,
     });
 
     const signerAddress = paraAccount.address;
@@ -162,7 +147,7 @@ export const deploySafe = async (para: ParaWeb) => {
 
       console.log("Transaction Hash:", receipt);
       console.log(connectedProtocolKit.isSafeDeployed());
-      return { protocolKit: connectedProtocolKit, safeAddress, isDeployed };
+      return { protocolKit: connectedProtocolKit, isDeployed };
     } else {
       console.log("Safe is already deployed");
     }
@@ -224,23 +209,16 @@ export async function interactWithSafe(
   const paraViemClient = createParaViemClient(para, {
     account: paraAccount,
     chain: sepolia,
-    transport: http(RPC_ETHSEPOLIA, {
-      timeout: 10000,
-      retryDelay: 1000,
-    }),
+    transport: infura,
   });
 
   const walletClient = createPublicClient({
     chain: sepolia,
-    transport: http(RPC_ETHSEPOLIA, {
-      timeout: 10000,
-      retryDelay: 1000,
-    }),
+    transport: infura,
   });
 
   const signerAddress = paraAccount.address;
 
-  
   const safeAccountConfiguration: SafeAccountConfig = {
     owners: [signerAddress],
     threshold: 1,
@@ -253,7 +231,7 @@ export async function interactWithSafe(
   const protocolKit = await Safe.init({
     provider: paraViemClient.transport,
     signer: signerAddress,
-    predictedSafe
+    predictedSafe,
   });
 
   const safeAddress = await protocolKit.getAddress();
